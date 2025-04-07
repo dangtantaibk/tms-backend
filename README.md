@@ -38,6 +38,8 @@ git clone https://github.com/your-org/tms-backend.git
 cd tms-backend
 npm install
 ```
+# If you encounter bcrypt issues, rebuild it:
+npm rebuild bcrypt --build-from-source
 
 ### Environment Configuration
 Create a `.env` file based on `.env.example`:
@@ -48,6 +50,48 @@ DATABASE_USER=postgres
 DATABASE_PASSWORD=postgres
 DATABASE_NAME=tms
 JWT_SECRET=super-secret
+```
+
+### Database Configuration
+Example `docker-compose.yml` configuration for PostgreSQL:
+```yml
+version: '3.8'
+services:
+  postgres:
+    image: postgres:latest
+    container_name: tms-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres      # Should match DATABASE_USER in .env
+      POSTGRES_PASSWORD: postgres  # Should match DATABASE_PASSWORD in .env
+      POSTGRES_DB: tms            # Should match DATABASE_NAME in .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+```
+
+### Database Migration
+```bash
+# Generate a new migration
+npm run migration:generate src/database/migrations/init
+
+# Run migrations
+npm run migration:run
+
+# Revert last migration
+npm run migration:revert
+```
+
+### Run with Docker
+```bash
+# Start PostgreSQL container
+docker-compose up -d
+
+# Stop PostgreSQL container
+docker-compose down
 ```
 
 ### Run with Docker
@@ -68,19 +112,23 @@ Visit [http://localhost:3000/api](http://localhost:3000/api) for Swagger UI.
 ## Project Structure
 ```
 src/
-├── auth/              # Auth module
+├── auth/              # Authentication & authorization
 ├── users/             # User management
-├── roles/             # Role-based access
+├── roles/             # Role management
 ├── customers/         # Customer management
-├── vehicles/          # Vehicle records
+├── vehicles/          # Vehicle management
 ├── projects/          # Project management
-├── trips/             # Trip coordination
-├── shipment-items/    # Shipment item handling
-├── ship-to/           # Delivery address locations
-├── common/            # Common utilities, interceptors, guards
-├── config/            # App configuration
+├── trips/             # Trip management
+├── dispatch/          # Dispatch operations
+├── hubs/              # Hub management
+├── ship-to/           # Shipping destinations
+├── shipment-items/    # Shipment items handling
+├── shipping-orders/   # Shipping orders management
+├── import/            # Import functionality
+├── export/            # Export functionality
+├── common/            # Shared utilities
 ├── app.module.ts      # Root module
-├── main.ts            # App bootstrap
+├── main.ts            # Application entry point
 ```
 
 ---

@@ -1,0 +1,48 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug NestJS",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/nest",
+            "args": [
+                "start",
+                "--debug",
+                "--watch"
+            ],
+            "autoAttachChildProcesses": true,
+            "sourceMaps": true,
+            "envFile": "${workspaceFolder}/.env",
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "protocol": "inspector"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Development",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/nest",
+            "args": [
+                "start",
+                "--watch"
+            ],
+            "autoAttachChildProcesses": true,
+            "sourceMaps": true,
+            "envFile": "${workspaceFolder}/.env",
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+            "protocol": "inspector"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Production",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "start:prod"],
+            "skipFiles": ["<node_internals>/**"],
+            "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+            "console": "integratedTerminal"
+        }
+    ]
+}

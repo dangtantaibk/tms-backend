@@ -8,6 +8,14 @@ import { CustomersModule } from './customers/customers.module';
 import { User } from './users/entities/user.entity';
 import { Role } from './roles/entities/role.entity';
 import { Customer } from './customers/entities/customer.entity';
+import { Project } from './projects/entities/project.entity';
+import { Hub } from './hubs/entities/hub.entity';
+import { ShipmentItem } from './shipment-items/entities/shipment-item.entity';
+import { ShippingOrder } from './shipping-orders/entities/shipping-order.entity';
+import { Trip } from './trips/entities/trip.entity';
+import { Dispatch } from './dispatch/entities/dispatch.entity';
+import { ImportHistory } from './import/entities/import-history.entity';
+import { ExportHistory } from './export/entities/export-history.entity';
 import { ExportModule } from './export/export.module';
 import { ImportModule } from './import/import.module';
 import { DispatchModule } from './dispatch/dispatch.module';
@@ -21,6 +29,17 @@ import { TripsModule } from './trips/trips.module';
 import { Vehicle } from './vehicles/entities/vehicle.entity';
 import { VehiclesModule } from './vehicles/vehicles.module';
 // ... import các module khác
+import * as dotenv from 'dotenv';
+import { Logger } from '@nestjs/common';
+
+// Ensure environment variables are loaded
+dotenv.config();
+
+const logger = new Logger('Database');
+logger.log(`DATABASE_PASSWORD value: ${process.env.DATABASE_PASSWORD}`);
+logger.log(`DATABASE_PASSWORD value: ${process.env.DATABASE_PASSWORD}`);
+logger.log(`DATABASE_USER value: ${process.env.DATABASE_USER}`);
+logger.log(`NODE_ENV value: ${process.env.NODE_ENV}`);
 
 @Module({
   imports: [
@@ -29,12 +48,15 @@ import { VehiclesModule } from './vehicles/vehicles.module';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT, 10),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
-      entities: [User, Role, Customer],
+      host: process.env.DATABASE_HOST,
+      port:  parseInt(process.env.DATABASE_PORT || '5432', 10),
+      username: process.env.DATABASE_USER,
+      password: process.env.DATABASE_PASSWORD,
+      database: process.env.DATABASE_DATABASE,
+      entities: [User, Role, Customer, Project, Hub, ShipTo,
+        Vehicle, ShipmentItem, ShippingOrder, Trip,
+        Dispatch, ImportHistory, ExportHistory],
+      migrations: ['src/database/migrations/*.ts'],
       synchronize: process.env.NODE_ENV === 'development',
     }),
     AuthModule,

@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
-@Entity()
+@Entity('roles') // Change table name from 'role' to 'roles'
 export class Role {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -16,6 +16,16 @@ export class Role {
   permissions: string[];
 
   @ManyToMany(() => User, user => user.roles)
-  @JoinTable()
+  @JoinTable({
+    name: 'roles_users',
+    joinColumn: {
+      name: 'role_id',
+      referencedColumnName: 'id'
+    },
+    inverseJoinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id'
+    }
+  })
   users: User[];
-} 
+}
