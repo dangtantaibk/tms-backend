@@ -45,4 +45,34 @@ export class UsersService {
   async remove(id: string): Promise<void> {
     await this.usersRepository.delete(id);
   }
+
+  /**
+   * Get all permissions associated with a user
+   * @param userId The ID of the user
+   * @returns Array of permission strings
+   */
+  async getUserPermissions(userId: string): Promise<string[]> {
+    // Get the user with roles relationship
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['roles', 'roles.permissions'],
+    });
+
+    if (!user) {
+      return [];
+    }
+
+    // Extract unique permissions from all roles
+    const permissions = new Set<string>();
+    
+    // Loop through user roles and collect all permissions
+    for (const role of user.roles) {
+      for (const permission of role.permissions) {
+        permissions.add(permission);
+      }
+    }
+
+    return Array.from(permissions);
+  }
+    
 }

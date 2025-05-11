@@ -3,7 +3,7 @@ export default {
   port: parseInt(process.env.PORT || '3000'),
   apiPrefix: process.env.API_PREFIX || '/api/v1',
   jwtSecret: process.env.JWT_SECRET || 'your-secret-key',
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1d',
+  jwtExpiresIn: process.env.JWT_EXPIRATION || '1d',
   cors: {
     origin: process.env.CORS_ORIGIN || '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
