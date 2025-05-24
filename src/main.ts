@@ -1,20 +1,34 @@
-import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { json, urlencoded } from 'express';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    // logger: new CustomLoggerService(),
+  });
 
   // Global pipes
   app.useGlobalPipes(new ValidationPipe());
 
+    // Configure payload size limits (prevents "Payload Too Large" errors)
+  app.use(json({ limit: '30mb' }));  // Limits JSON payload size
+  app.use(urlencoded({ limit: '30mb', extended: true }));  // Limits form data size
+
   // Swagger configuration
   const config = new DocumentBuilder()
-    .setTitle('TMS API')
-    .setDescription('The Transportation Management System API description')
+    .setTitle('API Management System')
+    .setDescription('API Documentation')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      name: 'Authorization',
+      description: 'Enter JWT token',
+      in: 'header',
+    })
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
@@ -22,7 +36,11 @@ async function bootstrap() {
 
   // CORS
   app.enableCors();
-  
-  await app.listen(3000);
+
+  // Use the PORT from environment variables
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
+  console.log(`Application is running on: http://localhost:${port}`);
+  console.log(`Swagger documentation is available at: http://localhost:${port}/api`);
 }
 bootstrap();
