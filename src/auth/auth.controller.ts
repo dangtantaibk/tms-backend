@@ -34,15 +34,8 @@ export class AuthController {
     if (!email || !password) {
       throw new UnauthorizedException('Email and password are required');
     }
-    const user = await this.authService.validateUser(
-      loginDto.email,
-      loginDto.password,
-    );
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
 
-    const token = this.authService.login(user);
+    const token = this.authService.login(loginDto);
     LoggerUtil.log(this.logger, 'Login successful', { email: loginDto.email }, this.startTime);
     return token;
   }

@@ -1,27 +1,22 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { MicroserviceModule } from 'src/common/microservice/microservice.module';
 import { AuthController } from './auth.controller';
-import { UsersModule } from '../users/users.module';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from '../common/strategies/jwt.strategy';
+import { AuthService } from './auth.service';
 
 @Module({
   imports: [
-    UsersModule,
-    PassportModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: configService.get<string>('JWT_EXPIRATION') },
-      }),
-      inject: [ConfigService],
-    }),
+    MicroserviceModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService],
   exports: [AuthService],
 })
 export class AuthModule {} 
+
+// @Module({
+//   imports: [MicroserviceModule],
+//   controllers: [RolesController],
+//   providers: [RolesService],
+//   exports: [RolesService],
+// })
+// export class RolesModule {}

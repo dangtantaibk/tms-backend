@@ -4,6 +4,7 @@ import { CreateRoleDto } from './src/roles/dto/create-role.dto';
 import { UpdateRoleDto } from './src/roles/dto/update-role.dto';
 import { Role } from './src/roles/entities/role.entity';
 import { config } from 'dotenv';
+import { BaseResponse } from './src/common/interfaces/response.interface';
 config();
 
 class RoleMicroserviceTestClient {
@@ -34,39 +35,39 @@ class RoleMicroserviceTestClient {
   }
 
   // Core role methods
-  async createRole(createRoleDto: CreateRoleDto): Promise<Role> {
-    return firstValueFrom(this.client.send<Role>('role.create', createRoleDto));
+  async createRole(createRoleDto: CreateRoleDto): Promise<BaseResponse<Role>> {
+    return firstValueFrom(this.client.send<BaseResponse<Role>>('role.create', createRoleDto));
   }
 
-  async findAllRoles(): Promise<Role[]> {
-    return firstValueFrom(this.client.send<Role[]>('role.findAll', {}));
+  async findAllRoles(): Promise<BaseResponse<Role[]>> {
+    return firstValueFrom(this.client.send<BaseResponse<Role[]>>('role.findAll', {}));
   }
 
-  async findRoleById(id: string): Promise<Role> {
-    return firstValueFrom(this.client.send<Role>('role.findById', id));
+  async findRoleById(id: string): Promise<BaseResponse<Role>> {
+    return firstValueFrom(this.client.send<BaseResponse<Role>>('role.findById', id));
   }
 
-  async findRoleByName(name: string): Promise<Role> {
-    return firstValueFrom(this.client.send<Role>('role.findByName', name));
+  async findRoleByName(name: string): Promise<BaseResponse<Role>> {
+    return firstValueFrom(this.client.send<BaseResponse<Role>>('role.findByName', name));
   }
 
-  async updateRole(id: string, updateRoleDto: UpdateRoleDto): Promise<Role> {
+  async updateRole(id: string, updateRoleDto: UpdateRoleDto): Promise<BaseResponse<Role>> {
     const payload = { id, updateRoleDto };
-    return firstValueFrom(this.client.send<Role>('role.update', payload));
+    return firstValueFrom(this.client.send<BaseResponse<Role>>('role.update', payload));
   }
 
   async deleteRole(id: string): Promise<{ message: string }> {
     return firstValueFrom(this.client.send<{ message: string }>('role.delete', id));
   }
 
-  async addPermissions(id: string, permissions: string[]): Promise<Role> {
+  async addPermissions(id: string, permissions: string[]): Promise<BaseResponse<Role>> {
     const payload = { id, permissions };
-    return firstValueFrom(this.client.send<Role>('role.addPermissions', payload));
+    return firstValueFrom(this.client.send<BaseResponse<Role>>('role.addPermissions', payload));
   }
 
-  async removePermissions(id: string, permissions: string[]): Promise<Role> {
+  async removePermissions(id: string, permissions: string[]): Promise<BaseResponse<Role>> {
     const payload = { id, permissions };
-    return firstValueFrom(this.client.send<Role>('role.removePermissions', payload));
+    return firstValueFrom(this.client.send<BaseResponse<Role>>('role.removePermissions', payload));
   }
 
   async getUsersWithRole(roleId: string): Promise<any> {
@@ -74,7 +75,7 @@ class RoleMicroserviceTestClient {
   }
 
   // Test wrapper methods with error handling
-  async testFindAllRoles(): Promise<Role[]> {
+  async testFindAllRoles(): Promise<BaseResponse<Role[]>> {
     try {
       const result = await this.findAllRoles();
       console.log('✅ Find All Roles Result:', result);
@@ -85,7 +86,7 @@ class RoleMicroserviceTestClient {
     }
   }
 
-  async testCreateRole(): Promise<Role> {
+  async testCreateRole(): Promise<BaseResponse<Role>> {
     try {
       const createRoleDto: CreateRoleDto = {
         name: 'Test Role',
@@ -97,12 +98,12 @@ class RoleMicroserviceTestClient {
       console.log('✅ Create Role Result:', result);
       return result;
     } catch (error) {
-      console.error('❌ Create Role Error:', error.message);
+      console.error('❌ Create Role Error:', error.error.message);
       throw error;
     }
   }
 
-  async testFindRoleById(id: string): Promise<Role> {
+  async testFindRoleById(id: string): Promise<BaseResponse<Role>> {
     try {
       const result = await this.findRoleById(id);
       console.log('✅ Find Role By ID Result:', result);
@@ -113,7 +114,7 @@ class RoleMicroserviceTestClient {
     }
   }
 
-  async testFindRoleByName(name: string): Promise<Role> {
+  async testFindRoleByName(name: string): Promise<BaseResponse<Role>> {
     try {
       const result = await this.findRoleByName(name);
       console.log('✅ Find Role By Name Result:', result);
@@ -124,7 +125,7 @@ class RoleMicroserviceTestClient {
     }
   }
 
-  async testUpdateRole(id: string, updateData: UpdateRoleDto): Promise<Role> {
+  async testUpdateRole(id: string, updateData: UpdateRoleDto): Promise<BaseResponse<Role>> {
     try {
       const result = await this.updateRole(id, updateData);
       console.log('✅ Update Role Result:', result);
@@ -146,7 +147,7 @@ class RoleMicroserviceTestClient {
     }
   }
 
-  async testAddPermissions(id: string, permissions: string[]): Promise<Role> {
+  async testAddPermissions(id: string, permissions: string[]): Promise<BaseResponse<Role>> {
     try {
       const result = await this.addPermissions(id, permissions);
       console.log('✅ Add Permissions Result:', result);
@@ -157,7 +158,7 @@ class RoleMicroserviceTestClient {
     }
   }
 
-  async testRemovePermissions(id: string, permissions: string[]): Promise<Role> {
+  async testRemovePermissions(id: string, permissions: string[]): Promise<BaseResponse<Role>> {
     try {
       const result = await this.removePermissions(id, permissions);
       console.log('✅ Remove Permissions Result:', result);
@@ -194,42 +195,47 @@ async function runRoleTests() {
 
     // Test 1: Find all roles
     console.log('📋 Test 1: Find All Roles');
-    await client.testFindAllRoles();
+    const roles = await client.testFindAllRoles();
+    console.log('Roles:', roles);
+    if (roles && roles.data && roles.data.length !== 0) {
+      await client.testDeleteRole(roles.data[0].id);
+      console.log('No roles found, skipping further tests.');
+    }
 
     // Test 2: Create role
     console.log('\n🎭 Test 2: Create Role');
     const newRole = await client.testCreateRole();
 
-    if (newRole && newRole.id) {
+    if (newRole && newRole.data && newRole.data.id) {
       // Test 3: Find role by ID
       console.log('\n🔍 Test 3: Find Role By ID');
-      await client.testFindRoleById(newRole.id);
+      await client.testFindRoleById(newRole.data.id);
 
       // Test 4: Find role by name
       console.log('\n📛 Test 4: Find Role By Name');
-      await client.testFindRoleByName(newRole.name);
+      await client.testFindRoleByName(newRole.data.name);
 
       // Test 5: Update role
       console.log('\n✏️ Test 5: Update Role');
-      await client.testUpdateRole(newRole.id, {
+      await client.testUpdateRole(newRole.data.id, {
         description: 'Updated test role description'
       });
 
       // Test 6: Add permissions
       console.log('\n➕ Test 6: Add Permissions');
-      await client.testAddPermissions(newRole.id, ['delete', 'admin']);
+      await client.testAddPermissions(newRole.data.id, ['delete', 'admin']);
 
       // Test 7: Remove permissions
       console.log('\n➖ Test 7: Remove Permissions');
-      await client.testRemovePermissions(newRole.id, ['delete']);
+      await client.testRemovePermissions(newRole.data.id, ['delete']);
 
       // Test 8: Get users with role
       console.log('\n👥 Test 8: Get Users With Role');
-      await client.testGetUsersWithRole(newRole.id);
+      await client.testGetUsersWithRole(newRole.data.id);
 
       // Test 9: Delete role (commented out to preserve test data)
       console.log('\n🗑️ Test 9: Delete Role');
-      await client.testDeleteRole(newRole.id);
+      await client.testDeleteRole(newRole.data.id);
     }
 
   } catch (error) {

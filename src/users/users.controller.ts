@@ -124,6 +124,7 @@ export class UsersController {
   @ApiResponse({ status: 403, description: 'Forbidden' })
   async remove(@Param('id') id: string): Promise<void> {
     LoggerUtil.log(this.logger, 'Delete user', { id }, this.startTime);
-    return this.usersService.remove(id);
+    this.usersService.remove(id);
+    return;
   }
 }

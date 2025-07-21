@@ -4,6 +4,17 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Debug test-microservice-client",
+            "program": "${workspaceFolder}/test-microservice-client.ts",
+            "runtimeExecutable": "/Users/taidang/.nvm/versions/node/v20.19.1/bin/node",
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Debug NestJS",
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/nest",
             "args": [
@@ -39,9 +50,16 @@
             "request": "launch",
             "name": "Production",
             "runtimeExecutable": "npm",
-            "runtimeArgs": ["run", "start:prod"],
-            "skipFiles": ["<node_internals>/**"],
-            "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+            "runtimeArgs": [
+                "run",
+                "start:prod"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ],
             "console": "integratedTerminal"
         }
     ]

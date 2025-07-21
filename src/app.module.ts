@@ -10,14 +10,15 @@ import { Logger } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import { LoggingModule } from './common/logging/logging.module';
 import { MicroserviceModule } from './common/microservice/microservice.module';
+import { HealthController } from './common/microservice/health.controller';
 
 // Ensure environment variables are loaded
 dotenv.config();
 
 const logger = new Logger('Database');
-logger.log(`DATABASE_PASSWORD value: ${process.env.DATABASE_PASSWORD}`);
-logger.log(`DATABASE_USER value: ${process.env.DATABASE_USER}`);
-logger.log(`NODE_ENV value: ${process.env.NODE_ENV}`);
+logger.log(`USER_MICROSERVICE_HOST: ${process.env.USER_MICROSERVICE_HOST}`);
+logger.log(`USER_MICROSERVICE_PORT: ${process.env.USER_MICROSERVICE_PORT}`);
+logger.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 
 @Module({
   imports: [
@@ -35,5 +36,6 @@ logger.log(`NODE_ENV value: ${process.env.NODE_ENV}`);
     OrdersModule,
     LoggingModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}

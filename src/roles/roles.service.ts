@@ -3,6 +3,7 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { Role } from './entities/role.entity';
 import { MicroserviceClientManager } from '../common/microservice/microservice-client.manager';
+import { BaseResponse } from 'src/common/interfaces/response.interface';
 
 @Injectable()
 export class RolesService {
